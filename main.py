@@ -18,10 +18,13 @@ def calculate_statistics(list_values):
     std = np.nanstd(list_values)
     var = np.nanstd(list_values)
     rms = np.nanmean(np.sqrt(list_values**2))
-    return [n0, n05, n25, median, n75, n95, n100, mean, std, var, rms]
+    return (n0, n05, n25, median, n75, n95, n100, mean, std, var, rms)
 
-def calculate_crossings():
-    pass 
+def calculate_crossings(list_values):
+    zero_crossings = (np.sign(list_values[1:]*list_values[:-1]) == -1).sum()
+    mean_diff = list_values - np.nanmean(list_values)
+    mean_crossings = (np.sign(mean_diff[1:]*mean_diff[:-1]) == -1).sum()
+    return (zero_crossings, mean_crossings)
 
 def get_features():
     pass 
@@ -40,3 +43,9 @@ print(f"labels shape = {len(list_labels)}")
 
 
 
+'''
+a = [1, 2, 1, 1, -3, -4, 7, 8, 9, 10, -2, 1, -3, 5, 6, 7, -10]
+a = [1, 2, 1, 1, -3, -4, 7, 8, 9, 10, -2, 1, -3, 5, 6, 7]
+a = [2, 1, 1, -3, -4, 7, 8, 9, 10, -2, 1, -3, 5, 6, 7, -10]
+zero_crossings = a[1:] * a[:-1]
+'''
