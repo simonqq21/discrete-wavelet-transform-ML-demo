@@ -10,7 +10,15 @@ def calculate_statistics(list_values):
     n0 = np.nanpercentile(list_values, 0)
     n05 = np.nanpercentile(list_values, 5)
     n25 = np.nanpercentile()
-    pass 
+    median = np.nanpercentile(list_values, 50)
+    n75 = np.nanpercentile(list_values, 75)
+    n95 = np.nanpercentile(list_values, 95)
+    n100 = np.nanpercentile(list_values, 100)
+    mean = np.nanmean(list_values)
+    std = np.nanstd(list_values)
+    var = np.nanstd(list_values)
+    rms = np.nanmean(np.sqrt(list_values**2))
+    return [n0, n05, n25, median, n75, n95, n100, mean, std, var, rms]
 
 def calculate_crossings():
     pass 
@@ -29,4 +37,6 @@ print(f"signals = {list_signals}")
 print(f"signals shape = {list_signals.shape}")
 print(f"labels = {list_labels}")
 print(f"labels shape = {len(list_labels)}")
+
+
 
