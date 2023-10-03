@@ -21,9 +21,9 @@ def calculate_statistics(list_values):
     return (n0, n05, n25, median, n75, n95, n100, mean, std, var, rms)
 
 def calculate_crossings(list_values):
-    zero_crossings = (np.sign(list_values[1:]*list_values[:-1]) == -1).sum()
+    zero_crossings = (np.diff(np.sign(list_values[list_values!=0]))!=0).sum()
     mean_diff = list_values - np.nanmean(list_values)
-    mean_crossings = (np.sign(mean_diff[1:]*mean_diff[:-1]) == -1).sum()
+    mean_crossings = (np.diff(np.sign(mean_diff[mean_diff!=0]))!=0).sum()
     return (zero_crossings, mean_crossings)
 
 def get_features():
