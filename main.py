@@ -1,9 +1,14 @@
 import numpy as np
 import pywt
 from scipy.io import loadmat
+from scipy.stats import entropy 
+from sklearn.model_selection import train_test_split 
 
-def calculate_entropy():
-    pass 
+def calculate_entropy(list_values):
+    _, count = np.unique(list_values, return_counts=True)
+    probabilities = count / np.len(list_values)
+    entropy_of_list = entropy(probabilities)
+    return [entropy_of_list]
 
 def calculate_statistics(list_values):
     # get the 0th, 5th, 25th, 50th, 75th, and 95th percentiles
@@ -26,8 +31,23 @@ def calculate_crossings(list_values):
     mean_crossings = (np.diff(np.sign(mean_diff[mean_diff!=0]))!=0).sum()
     return (zero_crossings, mean_crossings)
 
-def get_features():
-    pass 
+def get_features(list_values):
+    entropy_features = calculate_entropy(list_values) 
+    statistical_features = calculate_statistics(list_values)
+    crossings_features = calculate_crossings(list_values)
+    return entropy_features + statistical_features + crossings_features
+
+def get_ecg_features(ecg_data, ecg_labels, waveletname):
+    list_features = [] 
+    list_unique_labels = list(set(ecg_labels))
+    list_labels = [list_unique_labels.index(elem) for elem in ecg_labels]
+    for signal in ecg_data:
+        list_coeff = pywt.wavedec(signal, waveletname)
+        features = [] 
+        for coeff in list_coeff:
+            features += get_features(coeff)
+        list_features.append(features)
+    return list_features, list_labels
 
 # read the ECG file 
 filename = 'ECGData/ECGData.mat'
@@ -40,7 +60,9 @@ print(f"signals = {list_signals}")
 print(f"signals shape = {list_signals.shape}")
 print(f"labels = {list_labels}")
 print(f"labels shape = {len(list_labels)}")
-
+x_train, x_test, y_train, y_test = train_test_split(list_signals, list_labels, test_size=0.2, shuffle=True)
+print(f"training size={len(x_train)}")
+print(f"testing size={len(x_test)}")
 
 
 '''
