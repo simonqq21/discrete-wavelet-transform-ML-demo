@@ -3,10 +3,11 @@ import pywt
 from scipy.io import loadmat
 from scipy.stats import entropy 
 from sklearn.model_selection import train_test_split 
+from sklearn.ensemble import GradientBoostingClassifier
 
 def calculate_entropy(list_values):
     _, count = np.unique(list_values, return_counts=True)
-    probabilities = count / np.len(list_values)
+    probabilities = count / len(list_values)
     entropy_of_list = entropy(probabilities)
     return [entropy_of_list]
 
@@ -14,7 +15,7 @@ def calculate_statistics(list_values):
     # get the 0th, 5th, 25th, 50th, 75th, and 95th percentiles
     n0 = np.nanpercentile(list_values, 0)
     n05 = np.nanpercentile(list_values, 5)
-    n25 = np.nanpercentile()
+    n25 = np.nanpercentile(list_values, 25)
     median = np.nanpercentile(list_values, 50)
     n75 = np.nanpercentile(list_values, 75)
     n95 = np.nanpercentile(list_values, 95)
@@ -23,13 +24,13 @@ def calculate_statistics(list_values):
     std = np.nanstd(list_values)
     var = np.nanstd(list_values)
     rms = np.nanmean(np.sqrt(list_values**2))
-    return (n0, n05, n25, median, n75, n95, n100, mean, std, var, rms)
+    return [n0, n05, n25, median, n75, n95, n100, mean, std, var, rms]
 
 def calculate_crossings(list_values):
     zero_crossings = (np.diff(np.sign(list_values[list_values!=0]))!=0).sum()
     mean_diff = list_values - np.nanmean(list_values)
     mean_crossings = (np.diff(np.sign(mean_diff[mean_diff!=0]))!=0).sum()
-    return (zero_crossings, mean_crossings)
+    return [zero_crossings, mean_crossings]
 
 def get_features(list_values):
     entropy_features = calculate_entropy(list_values) 
@@ -63,6 +64,17 @@ print(f"labels shape = {len(list_labels)}")
 x_train, x_test, y_train, y_test = train_test_split(list_signals, list_labels, test_size=0.2, shuffle=True)
 print(f"training size={len(x_train)}")
 print(f"testing size={len(x_test)}")
+
+train_ecg_features, train_ecg_labels = get_ecg_features(x_train, y_train, "db4")
+test_ecg_features, test_ecg_labels = get_ecg_features(x_test, y_test, "db4") 
+
+cls = GradientBoostingClassifier(n_estimators=2000) 
+cls.fit(train_ecg_features, train_ecg_labels)
+train_score = cls.score(train_ecg_features, train_ecg_labels)
+test_score = cls.score(test_ecg_features, test_ecg_labels)  
+print(f"train score = {train_score}")
+print(f"test score = {test_score}") 
+
 
 
 '''
